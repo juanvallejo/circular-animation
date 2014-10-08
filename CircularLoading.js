@@ -170,7 +170,7 @@ function animateCircleMainComponents(animationRate, animationStop) {
 				circleMainInitialized = false;
 			}
 		} else {
-			console.log('CircularLoadingError: A div has not been assigned to be used as a \'loading wrapper\'.');
+			console.log('CircularLoadingError: A div has not been assigned to be used as a \'loading wrapper\'. Try passing one as a parameter.');
 		}
 
 		return CircularLoading;
