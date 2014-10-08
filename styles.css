@@ -1,0 +1,36 @@
+@import url(http://fonts.googleapis.com/css?family=Open+Sans);
+
+body {
+font:400 16px 'Open Sans'; letter-spacing:0.1.5em; 
+background:rgb(52,71,84) url(bg.jpg) no-repeat 0 0 fixed;
+background-size:cover; color:rgb(35,49,57);
+}
+
+.circle-wrapper {
+border:7px solid rgba(146,221,179,0.09);
+border-radius:100%;
+position:absolute;
+width:248px; height:248px;
+z-index:0;
+}
+
+.point {
+background:rgb(146,221,179);
+border-width:3.09px;
+border-radius:100%;
+border-style:solid;
+border-color:rgb(146,221,179);
+position:absolute;
+width:0.01px; height:0.01px;
+z-index:1;
+}
+
+#wrapper {
+width:900px;
+margin:0 auto;
+position:relative;
+}
+
+	#circle-main {
+
+	}
