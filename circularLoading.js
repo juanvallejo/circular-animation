@@ -13,8 +13,11 @@
 * based on changing document dimensions, varying screen sizes. 
 **/
 
-var wrapper = document.getElementById('wrapper');			// content wrapper #div
-var circleMain = document.getElementById('circleMain');		// main circle div, centered on screen
+(function() {
+
+var circleMainInitialized = false;							// Tells program whether API has been called at least once.
+
+var circleMain;												// main animation div, holds current div context
 var circleMainPoints = [];									// array to hold all point segments to 'fill' circleMain
 
 /**
@@ -22,52 +25,8 @@ var circleMainPoints = [];									// array to hold all point segments to 'fill'
 **/
 var CIRCLEMAIN_MAX_POINT_AMOUNT = 900;									// total amount of segments to fill circleMain
 var CIRCLEMAIN_BORDER_WIDTH = 7;										// width of the circleMain border
-var CIRCLEMAIN_CIRCUMFERENCE = (2 * Math.PI * circleMain.clientWidth);	// calculate the circumference of circleMain
 var CIRCLEMAIN_ANIMATION_SPEED = 1000 / 60;								// animation speed for 'loading' of circleMain
 var CIRCLEMAIN_ANIMATION_RATE = 20;										// circles to fill at a time for circleMain animation
-
-/**
- * Define object that will hold dynamic event data as arrays of functions
- * that get called on a window event.
-**/
-var events = {
-	windowLoad:[],
-	windowResize:[],
-	windowScroll:[]
-};
-
-/**
- * Add event listeners to the "window" object and loop through arrays
- * of functions stored in the keys of our "events" object defined above.
-**/
-window.addEventListener('load', function() {
-	events.windowLoad.forEach(function(eventFunction) {
-		eventFunction.call(this);
-	});
-});
-
-window.addEventListener('resize', function() {
-	events.windowResize.forEach(function(eventFunction) {
-		eventFunction.call(this);
-	});
-});
-
-window.addEventListener('scroll', function() {
-	events.windowScroll.forEach(function(eventFunction) {
-		eventFunction.call(this);
-	});
-});
-
-
-/** 
- * Sets the height of the wrapper based on current window heig ht
- * @windowHeight = current height of window 
-**/
-function setWrapperHeightTo(windowHeight) {
-	windowHeight = windowHeight || window.innerHeight;		// sets windowHeight to current window size
- 
-	wrapper.style.height = windowHeight + 'px';				// sets wrapper style height to windowHeight in pixels
-}
 
 /**
  * Sets the position of a .circle div based on current window
@@ -188,39 +147,57 @@ function animateCircleMainComponents(animationRate, animationStop) {
  * This is because this script is imported after every div declaration
 **/
 (function main() {
-	// Define function to call anytime the window is resized or loaded
-	function centerElementPositions() {
-		setWrapperHeightTo(window.innerHeight);				//sets wrapper height to the current window height
+	//create our object 'API'
+	function CircularLoading(circleMainObject) {
+		// Save old value of CircleMain
+		var tempCircleMain = circleMain;
 
-		//centers the position of div element "circleMain"
-		setElementPositionTo(
-			[
-				(wrapper.clientWidth / 2) - (circleMain.clientWidth / 2),
-				(wrapper.clientHeight / 2) - (circleMain.clientHeight / 2)
-			], 
-			circleMain
-		);
+		// Assign new value to circleMain
+		circleMain = circleMainObject;
+
+		// only begin program if circleMain has been previously set
+		if(circleMain) {
+			// initialize program if not previously called
+			if(!circleMainInitialized) {
+				circleMainInitialized = true;
+
+				// prepare our new circleMain
+				createCircleMainComponents();
+			}
+
+			//if a new dom object context is called, allocate it
+			if(circleMainObject && circleMainObject != tempCircleMain) {
+				circleMainInitialized = false;
+			}
+		} else {
+			console.log('CircularLoadingError: A div has not been assigned to be used as a \'loading wrapper\'.');
+		}
+
+		return CircularLoading;
 	}
 
-	createCircleMainComponents();
+	//returns the current div object being used as circleMain
+	CircularLoading.CircleMain = function() {
+		return circleMain;
+	};
 
-	animateCircleMainComponents(CIRCLEMAIN_ANIMATION_RATE);
+	//returns the current div object being used as circleMain
+	CircularLoading.animate = function(degreeLimit) {
+		animateCircleMainComponents(CIRCLEMAIN_ANIMATION_RATE,degreeLimit);
+	};
 
-	//reload circleMain animation on circleMain click
-	circleMain.addEventListener('click', function() {
-		//reset display state of circleMain points
+	//reset display state of circleMain points
+	CircularLoading.reset = function() {
 		for(var i = 0; i < CIRCLEMAIN_MAX_POINT_AMOUNT; i++) {
 			circleMainPoints[i].style.display = 'none';
 		}
+	};
 
-		animateCircleMainComponents(CIRCLEMAIN_ANIMATION_RATE,270);
-	});
-
-	// Subscribe functions to window events
-	events.windowResize.push(centerElementPositions);
-	events.windowLoad.push(centerElementPositions);
+	//create global reference to our object 'API'
+	window.CircularLoading = CircularLoading;
 })();
 
+})();
 
 
 
